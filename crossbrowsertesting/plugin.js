@@ -416,7 +416,8 @@ cbt.runTest = function(run, callback) {
     os_api_name: configApiName,
     record_video: "true",
     browserstring: browserName,
-    name: runName
+    name: runName,
+    timeout: 180000
   };
 
   var elementResultsBase = elementResults.replace('_status','');
