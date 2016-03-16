@@ -118,7 +118,7 @@ cbt.getSavedBrowsers = function() {
     browsers = JSON.parse(bridge.prefManager.prefHasUserValue(prefName) ? bridge.prefManager.getCharPref(prefName) : "{}");
 
     for (var browserIndex = 0; browserIndex < browsers.length; browserIndex++) {
-      cbt.addSavedBrowser(browsers[browserIndex].configApiName, browsers[browserIndex].browserApiName);
+      cbt.addSavedBrowser(browsers[browserIndex].configApiName, browsers[browserIndex].browserApiName, browsers[browserIndex].resolutionApiName);
     }
 
   } catch (e) {
@@ -138,7 +138,7 @@ cbt.setSavedBrowsers = function() {
     configApiName = savedBrowserIdParts[1];
     browserApiName = savedBrowserIdParts[2];  
     
-    browser = {browserApiName: browserApiName, configApiName: configApiName}   
+    browser = {browserApiName: browserApiName, configApiName: configApiName, resolutionApiName: resolutionApiName}   
     browsers.push(browser);
   })
 
@@ -238,11 +238,13 @@ cbt.settingspanel.show = function(runSuite, callback) {
         newNode('div',{'id': 'cbtImmediateRun'},
           newNode('span', newNode('select', {'id': 'cbtConfigList', 'change': function() { cbt.configSelected(configs, jQuery('#cbtConfigList').val()) }}),
             newNode('select', {'id': 'cbtBrowserList'}),
+            newNode('select', {'id': 'cbtResolutionList'}),
             newNode('a', {'style': 'margin: 10px;', 'href': '#', 'id': 'cbtImmediateRun_run', 'click': function() {
                 var configApiName = jQuery('#cbtConfigList').val();
                 var browserApiName = jQuery('#cbtBrowserList').val();
+                var resolutionApiName = jQuery('#cbtResolutionList').val();
                 var elementResults = '#cbtImmediateRun_status'
-                var browser={browserApiName: browserApiName, configApiName:configApiName, elementResults:elementResults }
+                var browser={browserApiName: browserApiName, configApiName:configApiName, resolutionApiName:resolutionApiName, elementResults:elementResults }
                 
                 if (runSuite) {
                   browsers=[]
@@ -256,7 +258,8 @@ cbt.settingspanel.show = function(runSuite, callback) {
             newNode('a', {'style': 'margin: 10px;', 'href': '#', 'id': 'cbtImmediateRun_add', 'click': function() {
                 var configApiName = jQuery('#cbtConfigList').val();
                 var browserApiName = jQuery('#cbtBrowserList').val();
-                cbt.addSavedBrowser(configApiName, browserApiName);
+                var resolutionApiName = jQuery('#cbtResolutionList').val();
+                cbt.addSavedBrowser(configApiName, browserApiName, resolutionApiName);
 
               }}, _t('__cbt_add')
             )
@@ -345,15 +348,24 @@ cbt.saveLoginProfile = function(callback) {
 cbt.configSelected = function(configs, configApiName) {
   //clear the list
   jQuery('#cbtBrowserList').html("");
+  jQuery('#cbtResolutionList').html("");
   for (var i = 0; i < configs.length; i++) {
     if (configs[i].api_name == configApiName ) {
       var browsers = configs[i].browsers;
+      var resolutions = configs[i].resolutions;
       for (var j = 0; j < browsers.length; j++) {
-        var name = browsers[j].name;
-      
+        var name = browsers[j].name;      
         jQuery('#cbtBrowserList').append(newNode(
           'option',
           {'value': browsers[j].api_name},
+          name
+        ));
+      }
+      for (var k = 0; k < resolutions.length; k++) {
+        var name = resolutions[k].name;      
+        jQuery('#cbtResolutionList').append(newNode(
+          'option',
+          {'value': resolutions[k].name},
           name
         ));
       }
@@ -379,6 +391,7 @@ cbt.runTest = function(run, callback) {
 
   var configApiName = run.configApiName;
   var browserApiName = run.browserApiName;
+  var resolutionApiName = run.resolutionApiName;
   var elementResults = run.elementResults;
   var name = run.name;
 
@@ -414,6 +427,7 @@ cbt.runTest = function(run, callback) {
     browser_api_name: browserApiName,
     browserName: browserName,
     os_api_name: configApiName,
+    screen_resolution: resolutionApiName,
     record_video: "true",
     browserstring: browserName,
     name: runName,
@@ -629,7 +643,7 @@ cbt.clearElements = function(elementResultsBase) {
 
 }
 
-cbt.addSavedBrowser = function(configApiName, browserApiName) {
+cbt.addSavedBrowser = function(configApiName, browserApiName, resolutionApiName) {
   //cbtSavedBrowsers
 
   //populate cbtSavedBrowserListRunAllControls if this is the first element added
@@ -639,18 +653,18 @@ cbt.addSavedBrowser = function(configApiName, browserApiName) {
     );    
   }
 
-  var name = cbt.getSavedBrowserId(configApiName, browserApiName);
+  var name = cbt.getSavedBrowserId(configApiName, browserApiName, resolutionApiName);
   //add this browser as long as it does not already exist
   if(! document.getElementById(name)) {
     jQuery('#cbtSavedBrowserListEmpty').hide();
 
-    jQuery('#cbtSavedBrowserList').append(newNode('li', {'id': cbt.getSavedBrowserId(configApiName, browserApiName)},
+    jQuery('#cbtSavedBrowserList').append(newNode('li', {'id': cbt.getSavedBrowserId(configApiName, browserApiName, resolutionApiName)},
         newNode('div',
-          newNode('span', configApiName+" "+browserApiName),
-          newNode('a', {'id': cbt.getSavedBrowserId(configApiName, browserApiName)+'_run', 'href': '#', 'style':'padding-left:10px;', 'click': function() { cbt.runSavedBrowser(cbt.getSavedBrowserId(configApiName, browserApiName)); }}, _t('__cbt_run')),
-          newNode('a', {'id': cbt.getSavedBrowserId(configApiName, browserApiName)+'_del', 'href': '#', 'style':'padding-left:10px;', 'click': function() {cbt.delSavedBrowser(this)}}, 'x')
+          newNode('span', configApiName+" "+browserApiName+" "+resolutionApiName),
+          newNode('a', {'id': cbt.getSavedBrowserId(configApiName, browserApiName, resolutionApiName)+'_run', 'href': '#', 'style':'padding-left:10px;', 'click': function() { cbt.runSavedBrowser(cbt.getSavedBrowserId(configApiName, browserApiName, resolutionApiName)); }}, _t('__cbt_run')),
+          newNode('a', {'id': cbt.getSavedBrowserId(configApiName, browserApiName, resolutionApiName)+'_del', 'href': '#', 'style':'padding-left:10px;', 'click': function() {cbt.delSavedBrowser(this)}}, 'x')
         ),
-        newNode('div', {'id': cbt.getSavedBrowserId(configApiName, browserApiName)+'_status', 'style':'display:none'},'')
+        newNode('div', {'id': cbt.getSavedBrowserId(configApiName, browserApiName, resolutionApiName)+'_status', 'style':'display:none'},'')
       )
     );
   }
@@ -675,7 +689,8 @@ cbt.runSavedBrowser = function(savedBrowserId) {
   var savedBrowserIdParts = savedBrowserId.split("_");
   var configApiName = savedBrowserIdParts[1];
   var browserApiName = savedBrowserIdParts[2];
-  var run = {browserApiName: browserApiName, configApiName: configApiName, elementResults: '#'+savedBrowserId+'_status' }
+  var resolutionApiName = savedBrowserIdParts[3];
+  var run = {browserApiName: browserApiName, configApiName: configApiName, resolutionApiName: resolutionApiName, elementResults: '#'+savedBrowserId+'_status' }
   if (cbt_runSuite) {
     var browsers = []
     browsers.push(run);
@@ -706,8 +721,8 @@ cbt.runAllSavedBrowsers = function() {
     savedBrowserIdParts = savedBrowserId.split("_");
     configApiName = savedBrowserIdParts[1];
     browserApiName = savedBrowserIdParts[2];  
-    
-    run = {browserApiName: browserApiName, configApiName: configApiName, elementResults: '#'+savedBrowserId+'_status' }   
+    resolutionApiName = savedBrowserIdParts[3];
+    run = {browserApiName: browserApiName, configApiName: configApiName, resolutionApiName: resolutionApiName, elementResults: '#'+savedBrowserId+'_status' }   
     browsers.push(run);
   })
   cbt.runAllTests(browsers);
@@ -729,12 +744,12 @@ cbt.clearAllSavedBrowsers = function() {
 }
 
 
-cbt.getSavedBrowserHtml = function(configs, configApiName, browserApiName) {
-  return("<li id='"+cbt.getSavedBrowserId(configApiName, browserApiName)+"'>"+configApiName+" "+browserApiName+"<\li>");
+cbt.getSavedBrowserHtml = function(configs, configApiName, browserApiName, resolutionApiName) {
+  return("<li id='"+cbt.getSavedBrowserId(configApiName, browserApiName, resolutionApiName)+"'>"+configApiName+" "+browserApiName+" "+resolutionApiName+"<\li>");
 }
 
-cbt.getSavedBrowserId = function(configApiName, browserApiName) {
-  return("cbt_"+configApiName+"_"+browserApiName);
+cbt.getSavedBrowserId = function(configApiName, browserApiName, resolutionApiName, getSavedBrowserId) {
+  return("cbt_"+configApiName+"_"+browserApiName+"_"+resolutionApiName+"_"+getSavedBrowserId);
 }
 
 
@@ -807,6 +822,7 @@ cbt.runAllTests = function(browsers) {
               /*'settings': settings.sel2[settingsIndex],*/
               'browserApiName': browsers[browserIndex].browserApiName,
               'configApiName': browsers[browserIndex].configApiName,
+              'resolutionApiName': browsers[browserIndex].resolutionApiName,
               'elementResults': browsers[browserIndex].elementResults,
               'index': scriptIndexes[scriptIndex],
               'sessionId': null,
@@ -844,7 +860,8 @@ cbt.runAllTests = function(browsers) {
   if (cbt.runall.runIndex < cbt.runall.runs.length )  {
     configApiName = cbt.runall.runs[cbt.runall.runIndex].configApiName;
     browserApiName = cbt.runall.runs[cbt.runall.runIndex].browserApiName;
-    cbt.runall.runScript(configApiName, browserApiName, cbt.runall.runs.indexOf(cbt.runall.runs[cbt.runall.runIndex]));
+    resolutionApiName = cbt.runall.runs[cbt.runall.runIndex].resolutionApiName;
+    cbt.runall.runScript(configApiName, browserApiName, resolutionApiName, cbt.runall.runs.indexOf(cbt.runall.runs[cbt.runall.runIndex]));
   } else {
     if ( jQuery("#cbtSavedBrowserList_clear").length == 0 ) {
       //if ( ! jQuery("#cbtSavedBrowserList") ) {
@@ -856,16 +873,16 @@ cbt.runAllTests = function(browsers) {
   }
 };
 
-cbt.runall.processResult = function(result, configApiName, browserApiName, runIndex ) {
+cbt.runall.processResult = function(result, configApiName, browserApiName, resolutionApiName, runIndex ) {
   cbt.runall.runs[runIndex].complete = true;
   cbt.runall.runNext(configApiName, browserApiName);
 };
 
 
-cbt.runall.runScript = function(configApiName, browserApiName,runIndex) {
+cbt.runall.runScript = function(configApiName, browserApiName, resolutionApiName, runIndex) {
   jQuery("#script-num-" + runIndex).css('background-color', '#ffffaa');
   
-  cbt.runTest(cbt.runall.runs[runIndex], function(result) { cbt.runall.processResult(result, configApiName, browserApiName, runIndex); });
+  cbt.runTest(cbt.runall.runs[runIndex], function(result) { cbt.runall.processResult(result, configApiName, browserApiName, resolutionApiName, runIndex); });
 };
 
 

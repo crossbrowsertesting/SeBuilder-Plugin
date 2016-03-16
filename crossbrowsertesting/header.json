@@ -1,6 +1,6 @@
 {
   "headerVersion": 1,
-  "pluginVersion": "1.6",
+  "pluginVersion": "1.7",
   "builderMinVersion": "3.0.6",
   "builderMaxVersion": "3.*.*",
   "identifier": "crossbrowsertesting",
