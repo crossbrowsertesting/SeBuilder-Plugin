@@ -136,7 +136,8 @@ cbt.setSavedBrowsers = function() {
 
     savedBrowserIdParts = savedBrowserId.split("_");
     configApiName = savedBrowserIdParts[1];
-    browserApiName = savedBrowserIdParts[2];  
+    browserApiName = savedBrowserIdParts[2];
+    resolutionApiName = savedBrowserIdParts[3];
     
     browser = {browserApiName: browserApiName, configApiName: configApiName, resolutionApiName: resolutionApiName}   
     browsers.push(browser);
