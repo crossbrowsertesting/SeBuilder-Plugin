@@ -29,6 +29,7 @@ m.__save_login_profile = "Save script to screenshot advanced options page"
 m.__cbt_login_profile_name_default_text = "name this profile..."
 m.__cbt_seleniumtesting = "Selenium Testing"
 m.__screenshot_selenium_script_saved = "Saved!  You can now select this as a selenium script under the advanced options when launching a screenshot test."
+m.__screenshot_selenium_script_updated = "Saved! This script replaced an existing script with the same name"
 m.__cbt_untitled_script = "Untitled Script"
 m.__cbt_runsingle = "Run Script"
 m.__cbt_runsuite = "Run Suite"
@@ -36,12 +37,12 @@ m.__cbt_run_instructions = "Run on remote CrossBrowserTesting.com browsers"
 m.__cbt_testfinishedsuccessfully = "Test finished successfully!"
 m.__cbt_testfinishedunsuccessfully = "Test Failed - it did not run successfully."
 
-var cbt_runSuite = false;  
+var cbt_runSuite = false;
 //var run;
 
 //
 //alert("Starting up CBT !!!");
-builder.registerPostLoadHook(function() {  
+builder.registerPostLoadHook(function() {
   //alert("Starting up CBT #2 !!!");
   builder.gui.menu.addItem('file', _t('__cbt_settings'), 'file-cbt-settings', function() { cbt.settingspanel.show(false); });
 
@@ -51,7 +52,7 @@ builder.registerPostLoadHook(function() {
 
   builder.gui.menu.addItem('run', _t('__cbt_run_test_suite'), 'run-cbt-test-suite', function() {
     cbt.settingspanel.show(true);
-  });  
+  });
 })
 
 cbt.settingspanel = {};
@@ -76,7 +77,7 @@ cbt.getCredentials = function() {
     /*formSubmitURL*/ null,
     /*httprealm*/     'CrossBrowserTesting User Login'
   );
-  
+
   for (var i = 0; i < logins.length; i++) {
     return {'username': logins[i].username, 'authkey': logins[i].password};
   }
@@ -95,11 +96,11 @@ cbt.setCredentials = function() {
     /*formSubmitURL*/ null,
     /*httprealm*/     'CrossBrowserTesting User Login'
   );
-  
+
   for (var i = 0; i < logins.length; i++) {
     cbt.loginManager.removeLogin(logins[i]);
   }
-  
+
   var loginInfo = new cbt.loginInfo(
     /*hostname*/      'chrome://seleniumbuilder',
     /*formSubmitURL*/ null,
@@ -125,7 +126,7 @@ cbt.getSavedBrowsers = function() {
     return {};
   }
 
-  
+
 };
 
 cbt.setSavedBrowsers = function() {
@@ -138,12 +139,12 @@ cbt.setSavedBrowsers = function() {
     configApiName = savedBrowserIdParts[1];
     browserApiName = savedBrowserIdParts[2];
     resolutionApiName = savedBrowserIdParts[3];
-    
-    browser = {browserApiName: browserApiName, configApiName: configApiName, resolutionApiName: resolutionApiName}   
+
+    browser = {browserApiName: browserApiName, configApiName: configApiName, resolutionApiName: resolutionApiName}
     browsers.push(browser);
   })
 
-  
+
   var prefName = "extensions.seleniumbuilder.plugins.cbt.savedBrowsers";
   try {
     bridge.prefManager.setCharPref(prefName, JSON.stringify(browsers));
@@ -164,7 +165,7 @@ cbt.settingspanel.show = function(runSuite, callback) {
   var testDescription = _t('__cbt_runsingle');
   if (runSuite) {
     testDescription = _t('__cbt_runsuite');
-  } 
+  }
 
   cbt.getConfigs( function(err, configs) {
     cbt.settingspanel.dialog =
@@ -179,7 +180,7 @@ cbt.settingspanel.show = function(runSuite, callback) {
           newNode('tr',
             newNode('td', _t('__cbt_authkey') + " "),
             newNode('td', newNode('input', {id: 'cbt_authkey', type: 'text', value: credentials.authkey})),
-            newNode('td', 
+            newNode('td',
               newNode('span', ' ('),
               newNode('a', {'href': 'http://crossbrowsertesting.com/account?authkey', 'target': '_blank'}, _t('__cbt_lookup_api_key')),
               newNode('span', ') ')
@@ -194,13 +195,13 @@ cbt.settingspanel.show = function(runSuite, callback) {
         ),
         newNode('hr'),
         newNode('h3', _t('__cbt_runscreenshottest')),
-        newNode('div', 
+        newNode('div',
           newNode('span', ' '),
           newNode('span', _t('__cbt_addscreenshotloginprofile')),
           newNode('span', ' '),
-          newNode('a', {'href': 'http://crossbrowsertesting.com/faq/can-i-use-selenium-script-screenshot-system', 'target': '_blank'}, _t('__cbt_faq'))          
+          newNode('a', {'href': 'http://crossbrowsertesting.com/faq/can-i-use-selenium-script-screenshot-system', 'target': '_blank'}, _t('__cbt_faq'))
         ),
-        newNode('div', 
+        newNode('div',
           newNode('span', ' '),
           newNode('span', _t('__cbt_addscreenshotloginprofileinput')),
           newNode('span', ' '),
@@ -210,7 +211,7 @@ cbt.settingspanel.show = function(runSuite, callback) {
           newNode('a', {'href': '#', 'class': 'button', 'id': 'cbt-cancel', 'click': function() {
             cbt.saveLoginProfile();
             }}, _t('__save_login_profile')
-          ) 
+          )
         ),
         newNode('hr'),
         newNode('h3', _t('__cbt_seleniumtesting') + ' - ' + testDescription),
@@ -219,15 +220,15 @@ cbt.settingspanel.show = function(runSuite, callback) {
           newNode('span', ' | '),
           newNode('a', {'href': 'http://app.crossbrowsertesting.com/selenium/run', 'target': '_blank'}, _t('__cbt_see_all_selenium_tests')),
           newNode('span', ' | '),
-          newNode('a', {'href': 'http://crossbrowsertesting.com/faq/how-do-i-record-and-run-selenium-tests-selenium-builder', 'target': '_blank'}, _t('__cbt_faq'))  
+          newNode('a', {'href': 'http://crossbrowsertesting.com/faq/how-do-i-record-and-run-selenium-tests-selenium-builder', 'target': '_blank'}, _t('__cbt_faq'))
         ),
-        newNode('div', 
+        newNode('div',
           newNode('table', {style: 'border: none; margin-left: 20px; margin-bottom: 20px; background-color: ddd; width:90%', id: 'browserlisttable'},
             newNode('tr',
               newNode('td', {style: 'font-weight:bold'}, _t('__cbt_savedbrowserlist'))
             ),
             newNode('tr',
-              newNode('td', 
+              newNode('td',
                 newNode('div', {'id' : 'cbtSavedBrowserListEmpty'}, _t('__cbt_savedbrowserlistempty')),
                 newNode('ul', {'id' : 'cbtSavedBrowserList'}),
                 newNode('div', {'id' : 'cbtSavedBrowserListRunAllControls'}, '')
@@ -246,7 +247,7 @@ cbt.settingspanel.show = function(runSuite, callback) {
                 var resolutionApiName = jQuery('#cbtResolutionList').val();
                 var elementResults = '#cbtImmediateRun_status'
                 var browser={browserApiName: browserApiName, configApiName:configApiName, resolutionApiName:resolutionApiName, elementResults:elementResults }
-                
+
                 if (runSuite) {
                   browsers=[]
                   browsers.push(browser)
@@ -266,7 +267,7 @@ cbt.settingspanel.show = function(runSuite, callback) {
             )
           )
         ),
-        newNode('div', {'style': 'display: none', 'id': 'cbtImmediateRun_status'}, ""),        
+        newNode('div', {'style': 'display: none', 'id': 'cbtImmediateRun_status'}, ""),
         newNode('div', {style: 'margin-top:20px;'},
           //newNode('a', {'href': '#', 'class': 'button', 'id': 'cbt-ok', 'click': function() {
             ////var username = jQuery('#cbt_username').val();
@@ -281,8 +282,8 @@ cbt.settingspanel.show = function(runSuite, callback) {
             cbt.setSavedBrowsers();
             cbt.settingspanel.hide();
             }}, _t('__cbt_close')
-          ) 
-        )   
+          )
+        )
       );
     builder.dialogs.show(cbt.settingspanel.dialog);
     cbt.fillConfigs(configs);
@@ -294,7 +295,7 @@ cbt.settingspanel.show = function(runSuite, callback) {
 cbt.fillConfigs = function(configs) {
   for (var i = 0; i < configs.length; i++) {
     var name = configs[i].name;
-    
+
     jQuery('#cbtConfigList').append(newNode(
       'option',
       {'value': configs[i].api_name},
@@ -304,12 +305,14 @@ cbt.fillConfigs = function(configs) {
 }
 
 
+
+
 cbt.saveLoginProfile = function(callback) {
   cbt.setCredentials();
   jQuery('#edit-rc-connecting').show();
 
   var loginprofilename = jQuery('#cbt_login_profile_name').val();
-  
+
   scriptJson=builder.selenium2.io.getScriptDefaultRepresentation(builder.suite.getCurrentScript());
 
   if (loginprofilename.toUpperCase() == _t('__cbt_login_profile_name_default_text').toUpperCase() || loginprofilename.length==0) {
@@ -318,15 +321,15 @@ cbt.saveLoginProfile = function(callback) {
   }
 
   var data = {
-    "profile_name": loginprofilename,
+    "script_name": loginprofilename,
     "custom_script": scriptJson
   };
 
   jQuery.ajax({
-    beforeSend: function(xhr){ 
-      xhr.setRequestHeader('Authorization', 'Basic ' + btoa(jQuery('#cbt_username').val() + ":" + jQuery('#cbt_authkey').val())); 
+    beforeSend: function(xhr){
+      xhr.setRequestHeader('Authorization', 'Basic ' + btoa(jQuery('#cbt_username').val() + ":" + jQuery('#cbt_authkey').val()));
     },
-    url: 'https://app.crossbrowsertesting.com/api/v3/screenshots/loginprofiles',
+    url: 'https://app.crossbrowsertesting.com/api/v3/screenshots/seleniumscripts',
     type: 'POST',
     data: data,
     success: function(loginProfile) {
@@ -334,14 +337,47 @@ cbt.saveLoginProfile = function(callback) {
       alert(_t('__screenshot_selenium_script_saved'))
       callback(true)
     },
-    error: function(jqXHR, textStatus, errorThrown){ 
+    error: function(jqXHR, textStatus, errorThrown){
+      cbt.updateLoginProfile();
+      callback(false);
+    }
+
+  });
+};
+
+cbt.updateLoginProfile = function(callback) {
+  cbt.setCredentials();
+  jQuery('#edit-rc-connecting').show();
+
+  var loginprofilename = jQuery('#cbt_login_profile_name').val();
+
+  scriptJson=builder.selenium2.io.getScriptDefaultRepresentation(builder.suite.getCurrentScript());
+
+  var data = {
+    "script_name": loginprofilename,
+    "custom_script": scriptJson
+  };
+
+  jQuery.ajax({
+    beforeSend: function(xhr){
+      xhr.setRequestHeader('Authorization', 'Basic ' + btoa(jQuery('#cbt_username').val() + ":" + jQuery('#cbt_authkey').val()));
+    },
+    url: 'https://app.crossbrowsertesting.com/api/v3/screenshots/seleniumscripts/'+ loginprofilename,
+    type: 'PUT',
+    data: data,
+    success: function(loginProfile) {
       jQuery('#edit-rc-connecting').hide();
-      alert('Error saving login profile. Error: '+textStatus)
-     
+      alert(_t('__screenshot_selenium_script_updated'))
+      callback(true)
+    },
+    error: function(jqXHR, textStatus, errorThrown){
+      jQuery('#edit-rc-connecting').hide();
+      alert('Error saving/updating login profile. Error: '+textStatus)
+
       jQuery('#edit-rc-connecting').show();
       callback(false);
     }
-    
+
   });
 };
 
@@ -355,7 +391,7 @@ cbt.configSelected = function(configs, configApiName) {
       var browsers = configs[i].browsers;
       var resolutions = configs[i].resolutions;
       for (var j = 0; j < browsers.length; j++) {
-        var name = browsers[j].name;      
+        var name = browsers[j].name;
         jQuery('#cbtBrowserList').append(newNode(
           'option',
           {'value': browsers[j].api_name},
@@ -363,7 +399,7 @@ cbt.configSelected = function(configs, configApiName) {
         ));
       }
       for (var k = 0; k < resolutions.length; k++) {
-        var name = resolutions[k].name;      
+        var name = resolutions[k].name;
         jQuery('#cbtResolutionList').append(newNode(
           'option',
           {'value': resolutions[k].name},
@@ -396,7 +432,7 @@ cbt.runTest = function(run, callback) {
   var elementResults = run.elementResults;
   var name = run.name;
 
-  builder.views.script.clearResults(); 
+  builder.views.script.clearResults();
 
   var browserName = "internet explorer";
   if (browserApiName.toUpperCase().indexOf("FF") > -1) browserName = "firefox";
@@ -414,13 +450,13 @@ cbt.runTest = function(run, callback) {
       runName = builder.suite.path.path.split("/");
       runName = runName[runName.length - 1];
       runName = runName.split(".")[0];
-    } 
+    }
   } else {
     if (builder.getScript().path) {
       runName = builder.getScript().path.path.split("/");
       runName = runName[runName.length - 1];
       runName = runName.split(".")[0];
-    }     
+    }
   }
 
   var settings = {
@@ -436,7 +472,7 @@ cbt.runTest = function(run, callback) {
   };
 
   var elementResultsBase = elementResults.replace('_status','');
-  
+
 
   jQuery.ajax(
     "https://" + jQuery('#cbt_username').val() + ":" + jQuery('#cbt_authkey').val() + "@app.crossbrowsertesting.com/api/v3/account",
@@ -448,10 +484,10 @@ cbt.runTest = function(run, callback) {
 
         if (builder.suite.getCurrentScript().seleniumVersion == builder.selenium1) {
           alert("CrossBrowserTesting.com support begins with Selenium 2.  Please convert your script to Selenium 2 and run it.")
-        } else {  
+        } else {
 
           //need run.seleniumVersion set so stop works
-          run.seleniumVersion = builder.getScript().seleniumVersion;      
+          run.seleniumVersion = builder.getScript().seleniumVersion;
 
           if(document.getElementById(elementResultsBase.replace('#', '')+'_stop')) {
             jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)+'_stop').remove();
@@ -461,10 +497,10 @@ cbt.runTest = function(run, callback) {
           }
           if(document.getElementById(elementResultsBase.replace('#', '')+'_clear')) {
             jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)+'_clear').remove();
-          }        
+          }
 
           var postRunCallback = function (runResult) {
-           
+
             run.complete = true;
 
             var score = 'pass';
@@ -475,7 +511,7 @@ cbt.runTest = function(run, callback) {
 
             data = {"action": "set_score",
                   "score":score};
-            
+
             jQuery.ajax("https://" + jQuery("#cbt_username").val() + ":" + jQuery("#cbt_authkey").val() + "@app.crossbrowsertesting.com/api/v3/selenium/" + run.sessionId, {
               "headers": {"Authorization": "Basic " + btoa(jQuery('#cbt_username').val() + ":" + jQuery('#cbt_authkey').val())},
               "type": "PUT",
@@ -494,13 +530,13 @@ cbt.runTest = function(run, callback) {
 
             if ( ! jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)+'_clear').length) {
               jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)).append(
-                newNode('a', {'id': elementResultsBase.replace('#','')+'_clear', 'href': '#', 'style':'padding-left:10px;', 'click': function() { 
+                newNode('a', {'id': elementResultsBase.replace('#','')+'_clear', 'href': '#', 'style':'padding-left:10px;', 'click': function() {
                     cbt.clearElements(elementResultsBase);
                   }}, _t('__cbt_clear'))
               );
             }
 
-            builder.views.script.onEndRCPlayback(); 
+            builder.views.script.onEndRCPlayback();
 
             //show all the elements with an id starting with cbt and ending with _run (ie all the run links....)
             jQuery("[id^='cbt']:[id$='_run']").show();
@@ -511,7 +547,7 @@ cbt.runTest = function(run, callback) {
               callback(runResult);
             }
           };
-          
+
           var jobStartedCallback = function(response) {
 
             builder.views.script.onConnectionEstablished();
@@ -527,27 +563,27 @@ cbt.runTest = function(run, callback) {
             }
             jQuery(cbt.escapePeriodsInSelectors(elementResults)).show();
 
-      
+
             var elementResultsBase = elementResults.replace('_status','');
             jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)+'_run').hide();
             jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)+'_del').hide();
             jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)).append(
               newNode('a', {'id': elementResultsBase.replace('#','')+'_view', 'href': '#', 'style':'padding-left:10px;', 'click': function() { window.open("http://app.crossbrowsertesting.com/selenium/"+response.sessionId); }}, 'view')
             );
-                     
-           
+
+
             var path = _t('__cbt_untitled_script');
             if (builder.getScript().path) {
               var path = builder.getScript().path.path.split("/");
               path = path[path.length - 1];
               path = path.split(".")[0];
-            }          
-            
+            }
+
             //var path = builder.suite.hasScript() ? builder.getScript().path.path : null;
             jQuery(cbt.escapePeriodsInSelectors(elementResults)).html("Starting to run "+path);
             jQuery(cbt.escapePeriodsInSelectors(elementResults)).css("background-color", "#BFEE85")
           };
-         
+
           //var stepStateCallback = builder.stepdisplay.updateStepPlaybackState;
 
           stepStateCallback = function(r, script, step, stepIndex, state, message, error, percentProgress) {
@@ -560,7 +596,7 @@ cbt.runTest = function(run, callback) {
               if (!step) {
                 step = script.steps[r.currentStepIndex];
               }
-            } 
+            }
 
             builder.stepdisplay.updateStepPlaybackState(r, script, step, stepIndex, state, message, error, percentProgress);
           };
@@ -606,12 +642,12 @@ cbt.runTest = function(run, callback) {
 
           jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)+'_del').hide();
           jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)).append(
-            newNode('a', {'id': elementResultsBase.replace('#', '')+'_stop', 'href': '#', 'style':'padding-left:10px;', 'click': function() { 
+            newNode('a', {'id': elementResultsBase.replace('#', '')+'_stop', 'href': '#', 'style':'padding-left:10px;', 'click': function() {
                   jQuery(cbt.escapePeriodsInSelectors(elementResults)).html(_t('__cbt_preparing_stop'));
                   jQuery(cbt.escapePeriodsInSelectors(elementResultsBase)+'_stop').remove();
                   run.preserveRunSession = false;
                   run.playbackRun.preserveRunSession = false;
-      
+
                   //kill this run and any pending runs
                   cbt.runall.runIndex=cbt.runall.length;
                   builder.selenium2.rcPlayback.stopTest(run);
@@ -629,7 +665,7 @@ cbt.runTest = function(run, callback) {
       error: function(xhr, textStatus, errorThrown) {
         jQuery('#edit-rc-connecting').hide();
         jQuery(cbt.escapePeriodsInSelectors(elementResults)).css("background-color", "red")
-        jQuery(cbt.escapePeriodsInSelectors(elementResults)).html("Could not login.  Results:" + errorThrown); 
+        jQuery(cbt.escapePeriodsInSelectors(elementResults)).html("Could not login.  Results:" + errorThrown);
       }
     }
   );
@@ -650,8 +686,8 @@ cbt.addSavedBrowser = function(configApiName, browserApiName, resolutionApiName)
   //populate cbtSavedBrowserListRunAllControls if this is the first element added
   if ( ! jQuery("#cbtSavedBrowserList").has("li").length) {
     jQuery('#cbtSavedBrowserListRunAllControls').append(
-      newNode('a', {'id':'cbtSavedBrowserList_run', 'href': '#', 'style':'padding-left:10px;', 'click': function() { cbt.runAllSavedBrowsers(); }}, _t('__cbt_run_all'))  
-    );    
+      newNode('a', {'id':'cbtSavedBrowserList_run', 'href': '#', 'style':'padding-left:10px;', 'click': function() { cbt.runAllSavedBrowsers(); }}, _t('__cbt_run_all'))
+    );
   }
 
   var name = cbt.getSavedBrowserId(configApiName, browserApiName, resolutionApiName);
@@ -672,14 +708,14 @@ cbt.addSavedBrowser = function(configApiName, browserApiName, resolutionApiName)
 }
 
 cbt.delSavedBrowser = function(element) {
-  jQuery(element).parent().parent().remove(); 
+  jQuery(element).parent().parent().remove();
   if ( ! jQuery("#cbtSavedBrowserList").has("li").length) {
     jQuery('#cbtSavedBrowserListEmpty').show();
   }
 
   //remove cbtSavedBrowserListRunAllControls if this is the first element added
   if ( ! jQuery("#cbtSavedBrowserList").has("li").length) {
-    jQuery('#cbtSavedBrowserList_run').remove()   
+    jQuery('#cbtSavedBrowserList_run').remove()
   }
 
 }
@@ -718,12 +754,12 @@ cbt.runAllSavedBrowsers = function() {
       cbt.clearElements('#'+savedBrowserId);
     }
 
-    
+
     savedBrowserIdParts = savedBrowserId.split("_");
     configApiName = savedBrowserIdParts[1];
-    browserApiName = savedBrowserIdParts[2];  
+    browserApiName = savedBrowserIdParts[2];
     resolutionApiName = savedBrowserIdParts[3];
-    run = {browserApiName: browserApiName, configApiName: configApiName, resolutionApiName: resolutionApiName, elementResults: '#'+savedBrowserId+'_status' }   
+    run = {browserApiName: browserApiName, configApiName: configApiName, resolutionApiName: resolutionApiName, elementResults: '#'+savedBrowserId+'_status' }
     browsers.push(run);
   })
   cbt.runAllTests(browsers);
@@ -775,14 +811,14 @@ cbt.runall.runs = [];
 
 cbt.runAllTests = function(browsers) {
   jQuery('#edit-suite-editing').hide();
-  
+
   var scripts = [];
   var scriptIndexes = [];
-  
+
   var isSel2orLater = true;
   if (cbt_runSuite) {
     for (var i = 0; i < builder.suite.getScriptNames().length; i++) {
-      scriptIndexes.push(i); 
+      scriptIndexes.push(i);
       if (builder.suite.scripts[i].seleniumVersion == builder.selenium1) {
         isSel2orLater = false;
       }
@@ -800,10 +836,10 @@ cbt.runAllTests = function(browsers) {
     cbt.runall.scriptNames = builder.suite.getScriptNames();
     builder.dialogs.runall.getAllRows(scripts, function(scriptsIndexToRows) {
       cbt.runall.runs = [];
-      
+
       var runIndex = 0;
       var prevRun = null;
-      
+
       for (var browserIndex = 0; browserIndex < browsers.length; browserIndex++) {
         for (var scriptIndex = 0; scriptIndex < scriptIndexes.length; scriptIndex++) {
           var script = builder.suite.scripts[scriptIndexes[scriptIndex]];
@@ -850,13 +886,13 @@ cbt.runAllTests = function(browsers) {
 
     })
   }
-}  
+}
 
 
 
 //cbt.runall.runNext = function(configApiName, browserApiName) {
   cbt.runall.runNext = function() {
- 
+
   cbt.runall.runIndex++;
   if (cbt.runall.runIndex < cbt.runall.runs.length )  {
     configApiName = cbt.runall.runs[cbt.runall.runIndex].configApiName;
@@ -867,8 +903,8 @@ cbt.runAllTests = function(browsers) {
     if ( jQuery("#cbtSavedBrowserList_clear").length == 0 ) {
       //if ( ! jQuery("#cbtSavedBrowserList") ) {
         jQuery('#cbtSavedBrowserListRunAllControls').append(
-         newNode('a', {'id':'cbtSavedBrowserList_clear', 'href': '#', 'style':'padding-left:10px;', 'click': function() { cbt.clearAllSavedBrowsers(); }}, _t('__cbt_clear_all'))  
-        );    
+         newNode('a', {'id':'cbtSavedBrowserList_clear', 'href': '#', 'style':'padding-left:10px;', 'click': function() { cbt.clearAllSavedBrowsers(); }}, _t('__cbt_clear_all'))
+        );
       //}
     }
   }
@@ -882,7 +918,7 @@ cbt.runall.processResult = function(result, configApiName, browserApiName, resol
 
 cbt.runall.runScript = function(configApiName, browserApiName, resolutionApiName, runIndex) {
   jQuery("#script-num-" + runIndex).css('background-color', '#ffffaa');
-  
+
   cbt.runTest(cbt.runall.runs[runIndex], function(result) { cbt.runall.processResult(result, configApiName, browserApiName, resolutionApiName, runIndex); });
 };
 
@@ -911,7 +947,7 @@ function createDerivedInfo(name) {
       "wd = new RemoteWebDriver(\n" +
       "    new URL(\"http://" + jQuery('#cbt_username').val() + ":" + jQuery('#cbt_authkey').val() + "@hub.crossbrowsertesting.com:80/wd/hub\"),\n" +
       "    caps);"
-  });  
+  });
 };
 for (var i = 0; i < to_add.length; i++) {
   createDerivedInfo(to_add[i]);
